@@ -71,6 +71,7 @@ ui <- navbarPage(title = "PrIntMap-R",
                                 fluidRow(
                                   checkboxInput(inputId = "displayPTMs",
                                                 label = "Display PTMs"),
+                                  uiOutput("PTMoptions"),
                                   tipify(checkboxGroupInput(inputId = "PTM",
                                                             label = "PTMs",
                                                             choiceNames = c("Carbamidomethylation",
@@ -90,7 +91,8 @@ ui <- navbarPage(title = "PrIntMap-R",
                                   checkboxInput(inputId = "custom_PTM_check",
                                                 label = "CUSTOM", value = F),
                                   tipify(textInput(inputId = "custom_PTM",
-                                                   label = "Custom PTM"), "Enter a custom PTM (CUSTOM checkbox must be selected. Enter the PTM as a string as it is seen in the peptide column of your sample input."),))
+                                                   label = "Custom PTM"), "Enter a custom PTM (CUSTOM checkbox must be selected. Enter the PTM as a string as it is seen in the peptide column of your sample input."),
+                                  downloadButton("downloadPTMDF", "Download PTM .csv")))
                             ),
                             tipify(checkboxInput(inputId = "disp_origin",
                                                  label = "Display Origin Peptides",

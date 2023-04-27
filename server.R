@@ -98,6 +98,13 @@ server <- function(input, output, session) {
                    selected = "Average"), "This method will be used to combine data for all included columns. Options to sum data or average data.")
     }
   })
+  
+  output$PTMoptions <- renderUI({
+    checkboxGroupInput(inputId = "detectedPTMs",
+                       label = "Detected PTMS",
+                       choices = detect_PTMS(format = input$file_type,
+                                             peptideVector = unlist(peptides1())))
+  })
 
   intensity_vec1 <- reactive({
     create_intensity_vec(peptides1(), protein_obj1()[1], intensity = input$intensity_metric)
@@ -711,10 +718,11 @@ server <- function(input, output, session) {
   
 PTM_regex <- reactive({
   if(input$custom_PTM_check){
-    regex_list <- c(input$PTM, input$custom_PTM)
+    regex_list <- c(input$PTM, input$detectedPTMs, input$custom_PTM)
   }else{
-    regex_list <- input$PTM
+    regex_list <- c(input$PTM, input$detectedPTMs)
   }
+  print(regex_list)
   return(regex_list)
   })
 
@@ -1194,6 +1202,16 @@ PTM_regex_length <- reactive(length(PTM_regex()))
     },
     content = function(file) {
       write.csv(volcano_plot_download_df(), file, row.names = FALSE)
+    }
+  )
+  
+  output$downloadPTMDF <- downloadHandler(
+    filename <- function() {
+      "PTMDataFrame.csv"
+    },
+    
+    content <- function(file) {
+      write.csv(PTM_df_plot_bound(), file, row.names = F)
     }
   )
   

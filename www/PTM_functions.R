@@ -13,7 +13,6 @@ create_PTM_df_PEAKS <- function(peptide_df, protein, regex_pattern, intensity = 
       peptide_store <- append(peptide_store, peptide)
       modpeptide_store <- append(modpeptide_store, peptide_df$Peptide[i])
       intensity_store <- append(intensity_store, peptide_df[[intensity]][i])
-
     }
   }
   peptide_df <- data.frame(peptide_store, modpeptide_store, intensity_store)
@@ -104,11 +103,11 @@ create_PTM_df_stacked <- function(peptide_df, protein, regex_pattern, stacked_df
     
   }
   
-  # print(paste0("peptide_Df: ", nrow(peptide_df)))
-  # print(paste0("intensity_vec: ", length(intensity_vec)))
-  # print(paste0("mod_vector_list: ", length(mod_vector_list)))
-  # print(paste0("start_postion_vec: ", length(start_position_vec)))
-  # print(paste0("stacked_peptide_df: ", length(stacked_df)))
+  print(paste0("peptide_Df: ", nrow(peptide_df)))
+  print(paste0("intensity_vec: ", length(intensity_vec)))
+  print(paste0("mod_vector_list: ", length(mod_vector_list)))
+  print(paste0("start_postion_vec: ", length(start_position_vec)))
+  print(paste0("stacked_peptide_df: ", length(stacked_df)))
   peptide_df$intensity_value <- intensity_vec
   peptide_df$mod_position <- mod_vector_list
   peptide_df$start_position <- start_position_vec
@@ -235,5 +234,17 @@ add_PTM_layer_stacked_inten <- function(plot, PTM_df){
   return(plot)
 }
 
+
+detect_PTMS <- function(format = "PEAKS", peptideVector = NULL) {
+  
+  if (format == "PEAKS" | format == "Generic csv") {
+    PTMvec <- unique(unlist(str_extract_all(peptideVector, "\\([^\\(\\)]*\\)")))
+  } else {
+    PTMvec <- NULL
+  }
+  
+  PTMvec <- PTMvec[!is.na(PTMvec)]
+  return(PTMvec)
+}
 
 
