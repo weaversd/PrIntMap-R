@@ -54,30 +54,38 @@ create_PTM_df_PEAKS <- function(peptide_df, protein, regex_pattern, intensity = 
   return(peptide_df)
 }
 
-##created df for stacked peptide plot 
+##create df for stacked peptide plot
 create_PTM_df_stacked <- function(peptide_df, protein, regex_pattern, stacked_df){
-  start_position_vec <- vector()
-  mod_vector_list <- list()
-  y_val_vec <- vector()
-  intensity_vec <- vector()
-  peptide_df <- peptide_df[peptide_df$intensity_store > 0,]
-  
-  for(i in 1:nrow(peptide_df)){
-    mod_position_vec <- vector()
-    peptide <- peptide_df$peptide_store[i]
-    mod <- peptide_df[[regex_pattern]][i]
-    mod_strsplit <- strsplit(mod[[1]], "")
-    matches_df <- str_locate_all(protein, peptide)[[1]]
-    matches_count <- nrow(matches_df)
-    if (matches_count > 0) {
-      for (j in 1:matches_count) {
-        start <- matches_df[[j,1]]
+  peptide_df <- peptide_df[peptide_df$intensity_store_mod > 0,]
+  stacked_df$intensity_store_mod <-0
+  stacked_df$mod_position <- NA
+  stacked_df$PTM <- regex_pattern
+  for(i in 1:nrow(stacked_df)){
+    for(j in 1:nrow(peptide_df)){
+      mod_position_vec<-vector()
+      mod <- peptide_df[[regex_pattern]][j]
+      mod_strsplit <- strsplit(as.character(mod[[1]]), "")
+      if(stacked_df$peptide[i] == peptide_df$peptide_store[j]){
         for(k in 1:length(mod_strsplit)){
           if (mod_strsplit[k]=="x"){
-            mod_position_vec <- append(mod_position_vec, as.character(start + k - 1))
+            mod_position_vec <- append(mod_position_vec, as.character(stacked_df$start[i] + k - 1))
           }
         }
+        stacked_df$intensity_store_mod[i] <- stacked_df$intensity_store_mod[i] + peptide_df$intensity_store_mod[j]
+        if(length(mod_position_vec)>1){
+          stacked_df$mod_position[i] <-mod_position_vec[1]
+          for(l in 2:length(mod_position_vec)){
+            stacked_df %>% add_row(mod_position = mod_position_vec[l],
+                                   peptide=stacked_df$peptide[i],
+                                   intensity_value = stacked_df$intensity_value[i],
+                                   y_val = stacked_df$y_val[i], intensity_store_mod = stacked_df$intensity_store_mod[i],
+                                   PTM = stacked_df$PTM[i])
+          }
+        }else{
+          stacked_df$mod_position[i] <- mod_position_vec
+        }
       }
+<<<<<<< HEAD
       if(!"x" %in% mod_strsplit){
         mod_position_vec <- as.character(0)
       }
@@ -121,20 +129,16 @@ create_PTM_df_stacked <- function(peptide_df, protein, regex_pattern, stacked_df
       }
     }else{
       y_val_vec <- c(y_val_vec, m)
+=======
+>>>>>>> 8c16bb1628c19be355ac0c6c43438faddc61483b
     }
   }
-  peptide_df$y_val <- y_val_vec
-  peptide_df <- as.data.frame(separate_rows(peptide_df, mod_position, sep = "  "))
-  peptide_df <- peptide_df %>%
-    group_by(peptide_store, intensity_value, mod_position, y_val) %>%
-    dplyr::summarise(intensity_store_mod = sum(intensity_store_mod)) %>%
-    as.data.frame()
-  stacked_df <- subset(peptide_df, peptide_df$mod_position != "0")
-  stacked_df$mod_position <- as.numeric(stacked_df$mod_position)
-  stacked_df$PTM <- regex_pattern
-  stacked_df <- stacked_df[stacked_df$intensity_value > 0,]
+ stacked_df$mod_position <- as.numeric(stacked_df$mod_position)
+ stacked_df <- stacked_df[stacked_df$intensity_value > 0,]
+
   return(stacked_df)
 }
+
 
 ##create new df the length of #AA in protein, including PTMs, intensity, etc.
 create_PTM_plot_df_PEAKS <- function(peptide_df, protein, regex_pattern, intensity_vector_input, origin_pep_vector){
@@ -218,7 +222,7 @@ add_PTM_layer_stacked <- function(plot, PTM_df){
 
     plot <- plot + 
       geom_point(data = PTM_df, shape = 16, aes(x = mod_position, y = y_val,
-                                         text = peptide_store, 
+                                         text = peptide, 
                                          intensity_label = intensity_store_mod/intensity_value,
                                          fill = PTM), 
                  size =2, stroke = NA) 
@@ -227,7 +231,7 @@ add_PTM_layer_stacked <- function(plot, PTM_df){
 
 add_PTM_layer_stacked_inten <- function(plot, PTM_df){
     plot <- plot + 
-      geom_point(data = PTM_df, shape = 16, aes(x = mod_position, y = intensity_value, text = peptide_store, 
+      geom_point(data = PTM_df, shape = 16, aes(x = mod_position, y = intensity_value, text = peptide, 
                                          intensity_label = intensity_store_mod/intensity_value,
                                          fill = PTM), 
                  size =2, stroke = NA) 
