@@ -85,59 +85,14 @@ create_PTM_df_stacked <- function(peptide_df, protein, regex_pattern, stacked_df
           stacked_df$mod_position[i] <- mod_position_vec
         }
       }
-<<<<<<< HEAD
-      if(!"x" %in% mod_strsplit){
-        mod_position_vec <- as.character(0)
-      }
     }
-    
-    
-    matches <- sum(stacked_df$peptide == peptide)
-    if (matches != 1) {
-      print(matches)
-      print(paste0("i is: ", i))
-      print(stacked_df[stacked_df$peptide == peptide,])
-    }
-    for(l in 1:nrow(stacked_df)){
-      if(peptide == stacked_df$peptide[l]){
-        intensity_vec <- c(intensity_vec, stacked_df$intensity_value[l])
-      }
-    }
-    # print(paste0("i is ", i, ": intensity_vec is ", length(intensity_vec)))
-    
-    start_position_vec <- c(start_position_vec, start)
-    mod_vector_list[[i]] <- mod_position_vec
-    
-    
   }
+  stacked_df$mod_position <- as.numeric(stacked_df$mod_position)
+  stacked_df <- stacked_df[stacked_df$intensity_value > 0,]
   
-  print(paste0("peptide_Df: ", nrow(peptide_df)))
-  print(paste0("intensity_vec: ", length(intensity_vec)))
-  print(paste0("mod_vector_list: ", length(mod_vector_list)))
-  print(paste0("start_postion_vec: ", length(start_position_vec)))
-  print(paste0("stacked_peptide_df: ", length(stacked_df)))
-  peptide_df$intensity_value <- intensity_vec
-  peptide_df$mod_position <- mod_vector_list
-  peptide_df$start_position <- start_position_vec
-  peptide_df <- peptide_df[order(peptide_df$start_position, peptide_df$peptide_store ),]
-  for(m in 1:nrow(peptide_df)){
-    if(m>1){
-      if(peptide_df$peptide_store[m] == peptide_df$peptide_store[m-1]){
-        y_val_vec <- c(y_val_vec, y_val_vec[[m-1]])
-      }else{
-        y_val_vec <- c(y_val_vec, y_val_vec[[m-1]]+1)
-      }
-    }else{
-      y_val_vec <- c(y_val_vec, m)
-=======
->>>>>>> 8c16bb1628c19be355ac0c6c43438faddc61483b
-    }
-  }
- stacked_df$mod_position <- as.numeric(stacked_df$mod_position)
- stacked_df <- stacked_df[stacked_df$intensity_value > 0,]
-
   return(stacked_df)
 }
+
 
 
 ##create new df the length of #AA in protein, including PTMs, intensity, etc.
